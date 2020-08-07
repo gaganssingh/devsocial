@@ -2,6 +2,7 @@ const express = require("express");
 const { check, validationResult } = require("express-validator");
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const normalize = require("normalize-url");
 
 const User = require("../../models/User");
@@ -63,13 +64,26 @@ router.post(
          await user.save();
 
          // Return jsonwebtoken
-         res.send(user);
+         const payload = {
+            user: {
+               id: user.id, // mongoose automatically converts _id to id
+            },
+         };
+
+         jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: 360000 },
+            (err, token) => {
+               if (err) throw err;
+
+               res.json({ token });
+            }
+         );
       } catch (err) {
          console.error(err.message);
          res.status(500).send(`Server error`);
       }
-
-      res.json(user);
    }
 );
 
