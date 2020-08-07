@@ -11,6 +11,9 @@ const app = express();
 // DB connection
 connectDB();
 
+// Middlewares
+app.use(express.json()); // Body parser
+
 app.get("/", (req, res) => res.send("API Running"));
 
 // Routes
